@@ -1,0 +1,21 @@
+{
+  "name": "mathvision-frontend",
+  "version": "1.0.0",
+  "description": "MathVision Frontend - Mathematical expression recognition",
+  "type": "module",
+  "scripts": {
+    "dev": "npx serve .",
+    "build": "echo 'No build step required for static HTML'",
+    "lint": "echo 'No linting configured'"
+  },
+  "dependencies": {
+    "@vercel/analytics": "^1.1.1"
+  },
+  "keywords": [
+    "math",
+    "vision",
+    "analytics"
+  ],
+  "author": "",
+  "license": "ISC"
+}
