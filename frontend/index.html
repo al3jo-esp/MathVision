@@ -230,7 +230,7 @@ setD:"Adjust appearance and language.",theme:"Theme",tSys:"Match system",tLight:
 eType:"Choose a valid image file.",eBig:"The image is larger than 20 MB.",eNet:"Could not reach the server. Check that the backend is running at {u}.",eTo:"The server took too long to respond.",eBad:"The server response is not in the expected format.",eNoImg:"Choose an image first.",eNoDr:"Draw something first.",crumb:"Workspace / "}};
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const LS={get(k,d){try{const v=localStorage.getItem(k);return v===null?d:v}catch{return d}},set(k,v){try{localStorage.setItem(k,v)}catch{}}};
-const API="http://127.0.0.1:8000";
+const API="https://mathvision-api-vuch.onrender.com";
 let lang=LS.get("mathvision_language",["ca","en","es"].find(l=>navigator.language.startsWith(l))||"es");
 let theme=LS.get("mathvision_theme",LS.get("mathvision_dark")==="false"?"light":LS.get("mathvision_dark")==="true"?"dark":"dark");
 let hist=[];try{hist=JSON.parse(LS.get("mathvision_history","[]"))||[]}catch{}
