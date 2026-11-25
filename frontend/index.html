@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f3f5f7">
+<title>MathVision</title>
+<style>
+:root{--bg:#f3f5f7;--side:#eaeef2;--sf:#fff;--tx:#15202b;--mu:#566676;--bd:#dbe2ea;--ac:#2447c7;--acs:#e8edfc;--grid:#dbe4f0;--ok:#1b7f55;--wa:#a8660f;--bad:#bb3a2a;--hv:#e3e9f0;--sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;--math:"Cambria Math","STIX Two Math","Iowan Old Style",Palatino,Cambria,ui-serif,serif;--bn:64px;color-scheme:light}
+[data-theme=dark]{--bg:#10141a;--side:#0c1015;--sf:#1a2029;--tx:#e8edf3;--mu:#9aa7b6;--bd:#2a3340;--ac:#8fa8ff;--acs:#1e2a4f;--grid:#232d3b;--ok:#62cf9f;--wa:#e6b95a;--bad:#ff8f7d;--hv:#242d39;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{font:15px/1.55 var(--sans);background:var(--bg);color:var(--tx);overflow:hidden}
+button,input,select{font:inherit;color:inherit}button{cursor:pointer}
+:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+[hidden]{display:none!important}
+.app{display:flex;height:100dvh}
+.side{width:248px;flex:none;background:var(--side);border-right:1px solid var(--bd);display:flex;flex-direction:column;padding:20px 14px}
+.brand{display:flex;align-items:center;gap:11px;border:0;background:none;padding:4px 8px 24px;text-align:left}
+.logo{width:36px;height:36px;border-radius:10px;background:var(--ac);color:var(--sf);display:grid;place-items:center;font:600 22px var(--math)}
+[data-theme=dark] .logo{color:#10141a}
+.brand b{font-size:17px;letter-spacing:-.3px;display:block;line-height:1.2}.brand small{color:var(--mu);font-size:12px}
+.nav{display:flex;align-items:center;gap:10px;width:100%;border:0;background:none;border-radius:9px;padding:10px 11px;color:var(--mu);margin-bottom:2px;text-align:left}
+.nav:hover{background:var(--hv);color:var(--tx)}.nav[aria-current=page]{background:var(--sf);color:var(--tx);box-shadow:inset 0 0 0 1px var(--bd)}
+.nav svg{width:18px;height:18px;flex:none}
+.sidefoot{margin-top:auto;padding-top:12px;border-top:1px solid var(--bd)}
+.account-trigger{display:flex;align-items:center;gap:10px;width:100%;padding:9px 10px;border:0;border-radius:10px;background:transparent;text-align:left;color:var(--tx)}
+.account-trigger:hover{background:var(--hv)}.account-avatar{width:34px;height:34px;flex:none;border-radius:50%;display:grid;place-items:center;background:var(--hv);color:var(--tx);font-weight:650}
+.account-trigger-text{min-width:0;flex:1}.account-trigger-text b,.account-trigger-text small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.account-trigger-text b{font-size:13px;font-weight:600}.account-trigger-text small{font-size:11px;color:var(--mu)}
+.account-trigger .chev{color:var(--mu);font-size:17px}
+#accountDialog{width:min(440px,calc(100vw - 32px));max-width:440px;padding:22px}
+#accountDialog .account-grid{grid-template-columns:1fr}#accountDialog .account-actions{flex-direction:column}#accountDialog .account-actions .btn{width:100%}
+.account-mobile{display:none}
+@media(max-width:700px){.account-mobile{display:block;margin-top:14px}.account-mobile .btn{width:100%}}
+.main{flex:1;min-width:0;overflow-y:auto;display:flex;flex-direction:column}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 32px;border-bottom:1px solid var(--bd);min-height:58px}
+.crumb{color:var(--mu);font-size:13px}
+.pill{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--mu);border:1px solid var(--bd);border-radius:99px;padding:4px 12px;background:var(--sf)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--mu)}.pill[data-s=ok] .dot{background:var(--ok)}.pill[data-s=off] .dot{background:var(--bad)}
+.wrap{width:100%;max-width:800px;margin:0 auto;padding:40px 28px 56px}
+.page{display:none}.page.on{display:block}
+h1{font:500 clamp(30px,4.4vw,44px)/1.12 var(--math);letter-spacing:-.8px;margin:0 0 10px}
+.lead{color:var(--mu);margin:0 0 28px;max-width:56ch}
+.tabs{display:inline-flex;gap:4px;background:var(--hv);padding:4px;border-radius:11px;margin-bottom:14px}
+.tab{border:0;background:none;padding:8px 16px;border-radius:8px;color:var(--mu);font-weight:550}
+.tab[aria-selected=true]{background:var(--sf);color:var(--tx);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.panel{background:var(--sf);border:1px solid var(--bd);border-radius:14px;padding:18px}
+.drop{min-height:230px;border:1.5px dashed var(--bd);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center;padding:24px;background:linear-gradient(var(--grid) 1px,transparent 1px) 0 0/24px 24px,linear-gradient(90deg,var(--grid) 1px,transparent 1px) 0 0/24px 24px;cursor:pointer;transition:border-color .15s,background-color .15s}
+.drop:hover,.drop.drag{border-color:var(--ac)}.drop.drag{background-color:var(--acs)}
+.drop strong{font-size:16px}.drop span{color:var(--mu);font-size:13px}
+.row{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:10px}
+.btn{border:1px solid var(--bd);background:var(--sf);border-radius:9px;padding:9px 15px;font-weight:550;transition:background .15s}
+.btn:hover{background:var(--hv)}.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.pri{background:var(--ac);border-color:var(--ac);color:var(--sf)}[data-theme=dark] .btn.pri{color:#10141a}
+.btn.pri:hover{filter:brightness(1.1)}.btn.dng{color:var(--bad)}
+.prev{display:flex;align-items:center;gap:14px;margin-top:14px;border:1px solid var(--bd);border-radius:10px;padding:10px}
+.prev img{width:64px;height:64px;object-fit:contain;border-radius:6px;background:var(--bg)}
+.prev div{flex:1;min-width:0}.prev b{overflow-wrap:anywhere;font-weight:550}.prev small{display:block;color:var(--mu)}
+.x{border:0;background:none;font-size:22px;line-height:1;color:var(--mu);padding:6px 10px;border-radius:8px}.x:hover{background:var(--hv)}
+.pad{position:relative;border:1px solid var(--bd);border-radius:10px;overflow:hidden;background:#fff linear-gradient(#dbe4f0 1px,transparent 1px) 0 0/24px 24px,linear-gradient(90deg,#dbe4f0 1px,transparent 1px) 0 0/24px 24px}
+#cv{display:block;width:100%;touch-action:none;cursor:crosshair}
+.tools{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:12px}.tools label{display:flex;align-items:center;gap:8px;color:var(--mu);font-size:13px;margin-right:auto}
+input[type=range]{accent-color:var(--ac);width:120px}
+.act{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:16px}.note{color:var(--mu);font-size:13px}
+.res{margin-top:20px;background:var(--sf);border:1px solid var(--bd);border-radius:14px;padding:22px}
+.res h2,.set h3{font-size:14px;margin:0 0 14px;font-weight:600;color:var(--mu)}
+.big{font:500 clamp(46px,9vw,76px)/1.05 var(--math);overflow-wrap:anywhere;letter-spacing:-1px}
+.cf{display:flex;align-items:baseline;gap:10px;margin-top:14px}.cf b{font-size:22px;font-variant-numeric:tabular-nums}
+.lvl{font-size:13px;font-weight:600}.lvl[data-l=hi]{color:var(--ok)}.lvl[data-l=mid]{color:var(--wa)}.lvl[data-l=lo]{color:var(--bad)}
+.bar{height:6px;background:var(--hv);border-radius:9px;overflow:hidden;margin-top:8px}.bar i{display:block;height:100%;width:0;background:var(--ac);border-radius:9px;transition:width .5s}
+.alts{margin-top:18px;padding-top:14px;border-top:1px solid var(--bd)}.alts p{margin:0 0 8px;color:var(--mu);font-size:13px}
+.alt{display:grid;grid-template-columns:44px 1fr 56px;gap:10px;align-items:center;padding:3px 0;font-variant-numeric:tabular-nums}.alt span:first-child{font:500 20px var(--math)}.alt span:last-child{text-align:right;color:var(--mu);font-size:13px}
+.err{margin-top:16px;padding:12px 14px;border-radius:10px;background:color-mix(in srgb,var(--bad) 12%,var(--sf));color:var(--bad);border:1px solid color-mix(in srgb,var(--bad) 35%,transparent)}
+.hist{display:flex;flex-direction:column;gap:8px}
+.he{display:flex;align-items:center;gap:12px;background:var(--sf);border:1px solid var(--bd);border-radius:11px;padding:10px}
+.he img{width:46px;height:46px;border-radius:7px;object-fit:cover;background:#fff;flex:none}
+.he>button.o{flex:1;min-width:0;display:flex;align-items:center;gap:14px;border:0;background:none;text-align:left;padding:0}
+.he .n{font:500 26px var(--math);min-width:48px;max-width:40%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.he small{color:var(--mu);display:block}.he .c{color:var(--ok);font-variant-numeric:tabular-nums;font-size:13px}
+.empty{text-align:center;padding:48px 20px;border:1px dashed var(--bd);border-radius:13px;color:var(--mu)}.empty b{color:var(--tx);display:block;margin-bottom:4px}
+.set{background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:18px;margin-bottom:12px}
+.sr{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}.sr small{color:var(--mu);display:block}
+select,input[type=url]{background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:9px 12px}input[type=url]{flex:1;min-width:200px}
+.account-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.account-grid .wide{grid-column:1/-1}.account-grid input{width:100%;min-width:0;background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:10px 12px}.account-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.google-btn{display:inline-flex;align-items:center;justify-content:center;gap:10px}.google-logo{width:18px;height:18px;flex:none}.account-note{font-size:13px;color:var(--mu);margin-top:10px}.account-status{font-size:13px;color:var(--mu);margin-top:8px;overflow-wrap:anywhere}.pad{border:2px solid var(--mu);box-shadow:0 0 0 1px var(--bd)}
+dialog{border:1px solid var(--bd);border-radius:14px;background:var(--sf);color:var(--tx);padding:22px;max-width:360px}dialog::backdrop{background:rgba(0,0,0,.45)}
+dialog .row{justify-content:flex-end}
+
+.about-card{font:inherit;border:1px solid var(--bd);border-radius:12px;background:var(--sf);padding:17px 18px;transition:background .15s,border-color .15s}.about-card:hover{background:var(--hv);border-color:var(--mu)}
+.about-dialog{width:min(760px,calc(100vw - 28px));max-width:760px;max-height:min(86dvh,900px);padding:0;overflow:hidden}
+.about-head{display:flex;justify-content:space-between;gap:18px;padding:25px 28px 20px;border-bottom:1px solid var(--bd)}.about-head h2{font:500 clamp(26px,4vw,36px)/1.15 var(--math);letter-spacing:-.5px;margin:6px 0}.about-kicker{font-size:11px;letter-spacing:1.2px;color:var(--mu);font-weight:650}.about-intro{margin:0;color:var(--mu);max-width:58ch}.about-body{padding:8px 28px 22px;overflow:auto;max-height:calc(min(86dvh,900px) - 170px)}.about-body section{padding:15px 0;border-bottom:1px solid var(--bd)}.about-body h3{font-size:15px;margin:0 0 7px}.about-body p{margin:7px 0;color:var(--mu)}.about-body li{margin:6px 0;color:var(--mu);padding-left:3px}.about-body strong{color:var(--tx);font-weight:620}.about-note{background:var(--hv);border:1px solid var(--bd);border-radius:10px;padding:14px 16px!important;margin-top:16px}.about-note p{margin-bottom:0}.about-version{font-size:12px;color:var(--mu);padding-top:12px}.about-foot{display:flex;justify-content:flex-end;padding:12px 28px;border-top:1px solid var(--bd);background:var(--sf)}
+@media(max-width:600px){.about-head{padding:20px 18px 16px}.about-body{padding:6px 18px 18px;max-height:calc(86dvh - 160px)}.about-foot{padding:10px 18px}}
+
+#toast{position:fixed;left:50%;bottom:calc(var(--bn) + 18px + env(safe-area-inset-bottom));transform:translate(-50%,20px);background:var(--tx);color:var(--bg);padding:10px 16px;border-radius:99px;opacity:0;pointer-events:none;transition:.2s;z-index:9}#toast.on{opacity:1;transform:translate(-50%,0)}
+.bnav{display:none}
+@media(min-width:701px){#toast{bottom:24px}}
+@media(max-width:700px){
+body{overflow:auto;height:auto}.app{height:auto;min-height:100dvh}.side{display:none}.main{overflow:visible;padding-bottom:calc(var(--bn) + env(safe-area-inset-bottom))}
+.top{padding:12px 16px}.crumb{display:none}.wrap{padding:26px 16px 36px}
+.bnav{display:flex;position:fixed;inset:auto 0 0;height:calc(var(--bn) + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);background:var(--side);border-top:1px solid var(--bd);z-index:5}
+.bnav .nav{flex-direction:column;justify-content:center;gap:2px;font-size:12px;border-radius:0;margin:0;text-align:center}.bnav .nav[aria-current=page]{background:none;box-shadow:none;color:var(--ac)}
+.act{flex-direction:column;align-items:stretch}.act .btn{width:100%}.alt{grid-template-columns:36px 1fr 52px}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="side">
+  <button class="brand" type="button" id="home" data-i18n-aria="new"><span class="logo" aria-hidden="true">∑</span><span><b>MathVision</b><small data-i18n="tag"></small></span></button>
+  <button class="nav" data-page="recognize"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3M8 12h8"/></svg><span data-i18n="rec"></span></button>
+  <button class="nav" data-page="history"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg><span data-i18n="hist"></span></button>
+  <button class="nav" data-page="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 7h9M18 7h1M5 17h1M10 17h9"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg><span data-i18n="set"></span></button>
+  <div class="sidefoot">
+    <button class="account-trigger" id="accountTrigger" type="button" aria-haspopup="dialog" aria-controls="accountDialog">
+      <span class="account-avatar" id="accountAvatar">?</span>
+      <span class="account-trigger-text"><b id="accountTriggerName">Cuenta</b><small id="accountTriggerSub">Inicia sesión</small></span>
+      <span class="chev" aria-hidden="true">···</span>
+    </button>
+  </div>
+</aside>
+<main class="main">
+<header class="top"><div class="crumb" id="crumb"></div><div class="pill" id="st" data-s="wait" role="status"><span class="dot"></span><span id="stT"></span></div></header>
+<div class="wrap">
+
+<section class="page on" id="page-recognize">
+  <h1 data-i18n="h1"></h1><p class="lead" data-i18n="lead"></p>
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" id="tab-up" aria-selected="true" data-tab="up" data-i18n="tUp"></button>
+    <button class="tab" role="tab" id="tab-dr" aria-selected="false" data-tab="dr" data-i18n="tDr"></button>
+  </div>
+  <div class="panel">
+    <div id="pn-up" role="tabpanel" aria-labelledby="tab-up">
+      <div class="drop" id="drop" role="button" tabindex="0" data-i18n-aria="drop">
+        <strong data-i18n="drop"></strong><span data-i18n="dropSub"></span>
+        <div class="row"><button class="btn" type="button" id="pick" data-i18n="pick"></button><button class="btn" type="button" id="cam" data-i18n="cam"></button></div>
+      </div>
+      <input type="file" id="f1" accept="image/*" hidden><input type="file" id="f2" accept="image/*" capture="environment" hidden>
+      <div class="prev" id="prev" hidden><img id="pimg" alt=""><div><b id="pname"></b><small id="psize"></small></div><button class="x" id="rm" type="button" data-i18n-aria="rm">×</button></div>
+    </div>
+    <div id="pn-dr" role="tabpanel" aria-labelledby="tab-dr" hidden>
+      <div class="pad"><canvas id="cv" aria-label="Zona de dibujo"></canvas></div>
+      <div class="tools"><label><span data-i18n="brush"></span><input type="range" id="bw" min="6" max="40" value="14"></label>
+        <button class="btn" type="button" id="undo" data-i18n="undo"></button><button class="btn" type="button" id="clr" data-i18n="clear"></button></div>
+    </div>
+    <div class="act"><span class="note" data-i18n="note"></span><button class="btn pri" id="go" type="button" disabled data-i18n="go"></button></div>
+  </div>
+  <div class="err" id="err" role="alert" hidden></div>
+  <section class="res" id="res" aria-live="polite" hidden>
+    <h2 data-i18n="res"></h2>
+    <div class="big" id="rNum"></div>
+    <div class="cf"><b id="rPct"></b><span class="lvl" id="rLvl"></span></div>
+    <div class="bar"><i id="rBar"></i></div>
+    <div class="row" style="justify-content:flex-start;margin-top:16px"><button class="btn" id="cp" type="button" data-i18n="copy"></button><button class="btn" id="cpt" type="button" data-i18n="copyTex"></button></div>
+    <div class="alts" id="alts"><p data-i18n="alt"></p><div id="altL"></div></div>
+  </section>
+</section>
+
+<section class="page" id="page-history">
+  <h1 data-i18n="hist"></h1><p class="lead" id="hSum"></p>
+  <div class="hist" id="hL"></div>
+  <div class="row" style="justify-content:flex-end;margin-top:14px"><button class="btn" id="exp" type="button" data-i18n="exp"></button><button class="btn dng" id="clrH" type="button" data-i18n="clearAll"></button></div>
+</section>
+
+<section class="page" id="page-settings">
+  <h1 data-i18n="set"></h1><p class="lead" data-i18n="setD"></p>
+  <div class="set"><div class="sr"><div><b data-i18n="theme"></b></div><select id="theme" data-i18n-aria="theme"><option value="system" data-i18n="tSys"></option><option value="light" data-i18n="tLight"></option><option value="dark" data-i18n="tDark"></option></select></div></div>
+  <div class="set"><div class="sr"><div><b data-i18n="lang"></b></div><select id="lang" data-i18n-aria="lang"><option value="es">Español</option><option value="ca">Català</option><option value="en">English</option></select></div></div>
+  <div class="account-mobile"><button class="btn" type="button" id="accountOpenFromSettings">Cuenta MathVision</button></div>
+  <button class="set about-card" id="openAbout" type="button" aria-haspopup="dialog" style="display:block;width:100%;text-align:left;color:var(--tx);cursor:pointer">
+    <span style="display:flex;align-items:center;justify-content:space-between;gap:12px"><b data-i18n="about">Acerca de MathVision</b><span aria-hidden="true" style="color:var(--mu);font-size:20px">↗</span></span>
+    <small style="display:block;color:var(--mu);margin-top:5px">MathVision v0.3 · Qué es, cómo funciona y cómo se ha desarrollado</small>
+  </button>
+</section>
+
+</div>
+</main>
+</div>
+<nav class="bnav" aria-label="Navegación"></nav>
+<dialog id="accountDialog" aria-labelledby="accountDialogTitle">
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px"><b id="accountDialogTitle">Cuenta MathVision</b><button class="x" id="accountClose" type="button" aria-label="Cerrar">×</button></div>
+  <p style="margin:0 0 12px;color:var(--mu);font-size:13px">Inicia sesión para sincronizar tu historial y tus preferencias entre dispositivos.</p>
+  <div id="signedOut">
+    <div class="account-grid"><input class="wide" id="authEmail" type="email" autocomplete="email" placeholder="Correo electrónico"><input class="wide" id="authPassword" type="password" autocomplete="current-password" placeholder="Contraseña"></div>
+    <div class="account-actions"><button class="btn pri" id="signIn" type="button">Iniciar sesión</button><button class="btn" id="signUp" type="button">Crear cuenta</button><button class="btn google-btn" id="googleSignIn" type="button"><svg class="google-logo" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><path fill="#4285F4" d="M43.6 24.5c0-1.4-.1-2.8-.4-4.1H24v7.8h11a9.4 9.4 0 0 1-4.1 6.2v5.1h6.6c3.9-3.6 6.1-8.8 6.1-15z"/><path fill="#34A853" d="M24 44c5.5 0 10.1-1.8 13.5-4.9l-6.6-5.1c-1.8 1.2-4.1 2-6.9 2-5.3 0-9.8-3.6-11.4-8.4H5.8v5.3A20 20 0 0 0 24 44z"/><path fill="#FBBC05" d="M12.6 27.6a12 12 0 0 1 0-7.2v-5.3H5.8a20 20 0 0 0 0 17.8l6.8-5.3z"/><path fill="#EA4335" d="M24 12c3 0 5.7 1 7.8 3.1l5.9-5.9C34.1 5.8 29.5 4 24 4A20 20 0 0 0 5.8 15.1l6.8 5.3C14.2 15.6 18.7 12 24 12z"/></svg><span>Continuar con Google</span></button></div>
+  </div>
+  <div id="signedIn" hidden><div class="account-status" id="accountEmail"></div><div class="account-actions"><button class="btn" id="syncNow" type="button">Sincronizar ahora</button><button class="btn" id="signOut" type="button">Cerrar sesión</button></div></div>
+  <div class="account-status" id="authStatus" role="status">Sin iniciar sesión. Los datos se guardan en este dispositivo.</div>
+</dialog>
+<dialog id="aboutDialog" aria-labelledby="aboutTitle" class="about-dialog">
+  <div class="about-head"><div><small class="about-kicker">MATHVISION · PROYECTO</small><h2 id="aboutTitle">Acerca de MathVision</h2><p class="about-intro">Una herramienta de reconocimiento de cifras manuscritas mediante inteligencia artificial.</p></div><button class="x" id="closeAbout" type="button" aria-label="Cerrar">×</button></div>
+  <div class="about-body">
+    <section><h3>¿Qué es MathVision?</h3><p>MathVision es una aplicación capaz de reconocer cifras escritas a mano. El usuario puede cargar una fotografía o imagen de un número y la aplicación utiliza una red neuronal para clasificarlo como una de las diez cifras, del 0 al 9.</p><p>El objetivo principal es mostrar de forma práctica cómo se puede entrenar y utilizar una red neuronal para resolver una tarea concreta de reconocimiento de imágenes.</p></section>
+    <section><h3>¿Cómo se ha creado?</h3><p>El modelo de inteligencia artificial se ha desarrollado en <strong>Python</strong> utilizando <strong>PyTorch</strong>. Para entrenarlo se ha utilizado el conjunto de datos <strong>MNIST</strong>, formado por imágenes de cifras manuscritas en escala de grises.</p><p>La arquitectura elegida es una <strong>red neuronal convolucional (CNN)</strong>. Sus capas convolucionales aprenden patrones visuales —como bordes y formas— y sus capas finales utilizan esos patrones para decidir qué cifra aparece en la imagen.</p><p>Después del entrenamiento inicial, el modelo se ha ajustado también con ejemplos de escritura manuscrita propios para adaptarlo mejor a otros estilos de escritura.</p></section>
+    <section><h3>¿Cómo funciona el reconocimiento?</h3><ol><li>El usuario selecciona una imagen que contiene una cifra.</li><li>El backend prepara la imagen: la convierte a escala de grises, localiza la cifra y adapta su tamaño al formato que espera la red neuronal.</li><li>La CNN analiza la imagen y calcula las probabilidades para las diez clases posibles.</li><li>MathVision muestra la cifra que obtiene la puntuación más alta, su nivel de confianza y otras posibilidades.</li></ol></section>
+    <section><h3>La tecnología detrás</h3><ul><li><strong>Python y PyTorch:</strong> desarrollo, entrenamiento y ejecución del modelo.</li><li><strong>MNIST:</strong> conjunto de datos utilizado como base para el entrenamiento.</li><li><strong>FastAPI:</strong> backend que recibe las imágenes y devuelve las predicciones.</li><li><strong>HTML, CSS y JavaScript:</strong> interfaz web desde la que se utiliza la aplicación.</li><li><strong>Supabase:</strong> gestión de cuentas y sincronización de historial y preferencias entre dispositivos.</li></ul></section>
+    <section class="about-note"><h3>Alcance y limitaciones</h3><p>La función principal actual de MathVision es reconocer <strong>una cifra manuscrita cada vez</strong>. No está diseñada para interpretar operaciones, ecuaciones completas ni páginas con varios ejercicios. La confianza que muestra el modelo es una estimación de sus probabilidades, no una garantía de que la predicción sea correcta.</p></section>
+    <p class="about-version">MathVision v0.3 · Proyecto educativo de reconocimiento de cifras manuscritas.</p>
+  </div>
+  <div class="about-foot"><button class="btn" id="closeAboutBottom" type="button">Cerrar</button></div>
+</dialog>
+<dialog id="dlg"><p id="dMsg" style="margin-top:0"></p><div class="row"><button class="btn" id="dNo" type="button" data-i18n="no"></button><button class="btn pri" id="dYes" type="button" data-i18n="yes"></button></div></dialog>
+<div id="toast" role="status"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const T={
+es:{new:"Nuevo reconocimiento",tag:"Matemáticas manuscritas",rec:"Reconocer",hist:"Historial",set:"Ajustes",ok:"Servidor conectado",off:"Sin conexión con el servidor",wait:"Conectando…",
+h1:"Del trazo al símbolo.",lead:"Sube una foto o dibuja a mano. MathVision reconoce lo que has escrito y te dice qué tan seguro está.",
+tUp:"Subir imagen",tDr:"Dibujar",drop:"Arrastra una imagen o pulsa para elegirla",dropSub:"También puedes pegarla con Ctrl+V. PNG, JPG y otros formatos.",pick:"Elegir archivo",cam:"Hacer foto",rm:"Quitar imagen",
+brush:"Grosor",undo:"Deshacer",clear:"Borrar",note:"Ctrl+Intro para analizar",go:"Analizar",goB:"Analizando…",res:"Resultado",conf:"confianza",hi:"Alta",mid:"Media",lo:"Baja",alt:"Otras posibilidades",
+copy:"Copiar texto",copyTex:"Copiar LaTeX",copied:"Copiado",nocopy:"No se pudo copiar",hSum:"{n} reconocimientos guardados, confianza media {a}%.",hNone:"Aquí aparecerán tus reconocimientos.",
+hE1:"Todavía no hay nada",hE2:"Analiza una imagen o un dibujo y se guardará aquí.",exp:"Exportar CSV",clearAll:"Borrar historial",cf:"¿Borrar todo el historial? No se puede deshacer.",yes:"Borrar",no:"Cancelar",del:"Eliminar del historial",
+setD:"Ajusta la apariencia y el idioma.",theme:"Tema",tSys:"Según el sistema",tLight:"Claro",tDark:"Oscuro",lang:"Idioma",api:"Dirección del servidor",apiD:"Donde está funcionando el backend.",test:"Probar conexión",about:"Acerca de",
+eType:"Elige un archivo de imagen válido.",eBig:"La imagen pesa más de 20 MB.",eNet:"No se ha podido conectar con el servidor. Comprueba que el backend está en marcha en {u}.",eTo:"El servidor ha tardado demasiado en responder.",eBad:"La respuesta del servidor no tiene el formato esperado.",eNoImg:"Primero elige una imagen.",eNoDr:"Primero dibuja algo.",crumb:"Espacio de trabajo / "},
+ca:{new:"Nou reconeixement",tag:"Matemàtiques manuscrites",rec:"Reconèixer",hist:"Historial",set:"Configuració",ok:"Servidor connectat",off:"Sense connexió amb el servidor",wait:"Connectant…",
+h1:"Del traç al símbol.",lead:"Puja una foto o dibuixa a mà. MathVision reconeix el que has escrit i et diu com de segur n'està.",
+tUp:"Pujar imatge",tDr:"Dibuixar",drop:"Arrossega una imatge o prem per triar-la",dropSub:"També pots enganxar-la amb Ctrl+V. PNG, JPG i altres formats.",pick:"Triar fitxer",cam:"Fer foto",rm:"Treure imatge",
+brush:"Gruix",undo:"Desfer",clear:"Esborrar",note:"Ctrl+Intro per analitzar",go:"Analitzar",goB:"Analitzant…",res:"Resultat",conf:"confiança",hi:"Alta",mid:"Mitjana",lo:"Baixa",alt:"Altres possibilitats",
+copy:"Copiar text",copyTex:"Copiar LaTeX",copied:"Copiat",nocopy:"No s'ha pogut copiar",hSum:"{n} reconeixements desats, confiança mitjana {a}%.",hNone:"Aquí apareixeran els teus reconeixements.",
+hE1:"Encara no hi ha res",hE2:"Analitza una imatge o un dibuix i es desarà aquí.",exp:"Exportar CSV",clearAll:"Esborrar historial",cf:"Vols esborrar tot l'historial? No es pot desfer.",yes:"Esborrar",no:"Cancel·lar",del:"Eliminar de l'historial",
+setD:"Ajusta l'aparença i l'idioma.",theme:"Tema",tSys:"Segons el sistema",tLight:"Clar",tDark:"Fosc",lang:"Idioma",api:"Adreça del servidor",apiD:"On està funcionant el backend.",test:"Provar connexió",about:"Sobre",
+eType:"Tria un fitxer d'imatge vàlid.",eBig:"La imatge pesa més de 20 MB.",eNet:"No s'ha pogut connectar amb el servidor. Comprova que el backend està en marxa a {u}.",eTo:"El servidor ha trigat massa a respondre.",eBad:"La resposta del servidor no té el format esperat.",eNoImg:"Primer tria una imatge.",eNoDr:"Primer dibuixa alguna cosa.",crumb:"Espai de treball / "},
+en:{new:"New recognition",tag:"Handwritten maths",rec:"Recognise",hist:"History",set:"Settings",ok:"Server connected",off:"No connection to the server",wait:"Connecting…",
+h1:"From stroke to symbol.",lead:"Upload a photo or draw by hand. MathVision reads what you wrote and tells you how sure it is.",
+tUp:"Upload image",tDr:"Draw",drop:"Drop an image or click to choose one",dropSub:"You can also paste it with Ctrl+V. PNG, JPG and other formats.",pick:"Choose file",cam:"Take photo",rm:"Remove image",
+brush:"Brush",undo:"Undo",clear:"Clear",note:"Ctrl+Enter to analyse",go:"Analyse",goB:"Analysing…",res:"Result",conf:"confidence",hi:"High",mid:"Medium",lo:"Low",alt:"Other possibilities",
+copy:"Copy text",copyTex:"Copy LaTeX",copied:"Copied",nocopy:"Could not copy",hSum:"{n} saved recognitions, average confidence {a}%.",hNone:"Your recognitions will appear here.",
+hE1:"Nothing here yet",hE2:"Analyse an image or a drawing and it will be saved here.",exp:"Export CSV",clearAll:"Clear history",cf:"Clear the whole history? This cannot be undone.",yes:"Clear",no:"Cancel",del:"Remove from history",
+setD:"Adjust appearance and language.",theme:"Theme",tSys:"Match system",tLight:"Light",tDark:"Dark",lang:"Language",api:"Server address",apiD:"Where the backend is running.",test:"Test connection",about:"About",
+eType:"Choose a valid image file.",eBig:"The image is larger than 20 MB.",eNet:"Could not reach the server. Check that the backend is running at {u}.",eTo:"The server took too long to respond.",eBad:"The server response is not in the expected format.",eNoImg:"Choose an image first.",eNoDr:"Draw something first.",crumb:"Workspace / "}};
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const LS={get(k,d){try{const v=localStorage.getItem(k);return v===null?d:v}catch{return d}},set(k,v){try{localStorage.setItem(k,v)}catch{}}};
+const API="http://127.0.0.1:8000";
+let lang=LS.get("mathvision_language",["ca","en","es"].find(l=>navigator.language.startsWith(l))||"es");
+let theme=LS.get("mathvision_theme",LS.get("mathvision_dark")==="false"?"light":LS.get("mathvision_dark")==="true"?"dark":"dark");
+let hist=[];try{hist=JSON.parse(LS.get("mathvision_history","[]"))||[]}catch{}
+let tab="up",file=null,url=null,busy=false,ctrl=null,page="recognize",last=null,stS="wait";
+const t=(k,v={})=>(T[lang][k]??T.es[k]??k).replace(/\{(\w+)\}/g,(_,x)=>v[x]);
+const TEX={"∞":"\\infty","α":"\\alpha","β":"\\beta","γ":"\\gamma","Γ":"\\Gamma","δ":"\\delta","Δ":"\\Delta","ε":"\\varepsilon","θ":"\\theta","λ":"\\lambda","μ":"\\mu","π":"\\pi","σ":"\\sigma","Σ":"\\Sigma","∑":"\\sum","φ":"\\phi","ω":"\\omega","Ω":"\\Omega","±":"\\pm","×":"\\times","÷":"\\div","≤":"\\leq","≥":"\\geq","≠":"\\neq","√":"\\sqrt{}","−":"-"};
+const toTex=s=>[...String(s)].map(c=>TEX[c]??c).join(" ");
+
+/* idioma, tema, navegación */
+function applyLang(){document.documentElement.lang=lang;
+  $$("[data-i18n]").forEach(e=>e.textContent=t(e.dataset.i18n));
+  $$("[data-i18n-aria]").forEach(e=>e.setAttribute("aria-label",t(e.dataset.i18nAria)));
+  $("#lang").value=lang;setStatus(stS);crumb();renderHist();buildBnav()}
+function applyTheme(){const dk=theme==="dark"||(theme==="system"&&matchMedia("(prefers-color-scheme:dark)").matches);
+  document.documentElement.dataset.theme=dk?"dark":"light";$("meta[name=theme-color]").content=dk?"#10141a":"#f3f5f7";$("#theme").value=theme}
+matchMedia("(prefers-color-scheme:dark)").addEventListener("change",applyTheme);
+function crumb(){$("#crumb").textContent=t("crumb")+t(page==="recognize"?"rec":page==="history"?"hist":"set")}
+function buildBnav(){const b=$(".bnav");b.innerHTML="";$$(".side .nav").forEach(n=>{const c=n.cloneNode(true);c.removeAttribute("data-i18n");b.appendChild(c)});markNav()}
+function markNav(){$$(".nav").forEach(n=>n.toggleAttribute("aria-current",false)||(n.dataset.page===page&&n.setAttribute("aria-current","page")))}
+function show(p){page=p;$$(".page").forEach(e=>e.classList.toggle("on",e.id==="page-"+p));markNav();crumb();if(p==="history")renderHist();if(p==="recognize"&&tab==="dr")sizeCv();$(".main").scrollTo({top:0})}
+document.addEventListener("click",e=>{const n=e.target.closest(".nav");if(n)show(n.dataset.page)});
+$("#home").onclick=()=>{show("recognize");removeImg();clearCv();hideOut()};
+$("#theme").onchange=e=>{theme=e.target.value;LS.set("mathvision_theme",theme);applyTheme();scheduleCloudSave()};
+$("#lang").onchange=e=>{lang=e.target.value;LS.set("mathvision_language",lang);applyLang();scheduleCloudSave()};
+
+/* utilidades de UI */
+function toast(m){const e=$("#toast");e.textContent=m;e.classList.add("on");clearTimeout(toast.i);toast.i=setTimeout(()=>e.classList.remove("on"),2000)}
+function ask(msg){return new Promise(r=>{const d=$("#dlg");$("#dMsg").textContent=msg;d.onclose=()=>r(d.returnValue==="y");$("#dYes").onclick=()=>d.close("y");$("#dNo").onclick=()=>d.close("n");d.showModal()})}
+function showErr(m){const e=$("#err");e.textContent=m;e.hidden=false}
+function hideOut(){$("#err").hidden=true;$("#res").hidden=true}
+function upd(){$("#go").disabled=busy||(tab==="up"?!file:!strokes.length);$("#go").textContent=t(busy?"goB":"go")}
+
+/* estado del servidor */
+function setStatus(s){stS=s;$("#st").dataset.s=s;$("#stT").textContent=t(s)}
+async function ping(){const c=new AbortController(),to=setTimeout(()=>c.abort(),3000);try{const r=await fetch(API+"/health",{signal:c.signal});if(!r.ok)throw new Error("HTTP "+r.status);setStatus("ok")}catch{setStatus("off")}finally{clearTimeout(to)}}
+
+/* pestañas */
+function setTab(n){tab=n;$$(".tab").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===n));$("#pn-up").hidden=n!=="up";$("#pn-dr").hidden=n!=="dr";if(n==="dr")sizeCv();upd()}
+$$(".tab").forEach(b=>b.onclick=()=>setTab(b.dataset.tab));
+
+/* imagen */
+const fmt=b=>b>1e6?(b/1e6).toFixed(1)+" MB":Math.max(1,Math.round(b/1e3))+" KB";
+function selectImg(f){hideOut();if(!f||!f.type.startsWith("image/"))return showErr(t("eType"));if(f.size>2e7)return showErr(t("eBig"));
+  if(url)URL.revokeObjectURL(url);file=f;url=URL.createObjectURL(f);$("#pimg").src=url;$("#pname").textContent=f.name;$("#psize").textContent=fmt(f.size);$("#prev").hidden=false;setTab("up")}
+function removeImg(){file=null;if(url)URL.revokeObjectURL(url);url=null;$("#prev").hidden=true;$("#f1").value=$("#f2").value="";upd()}
+$("#pick").onclick=e=>{e.stopPropagation();$("#f1").click()};$("#cam").onclick=e=>{e.stopPropagation();$("#f2").click()};
+$("#drop").onclick=()=>$("#f1").click();$("#drop").onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();$("#f1").click()}};
+$("#f1").onchange=$("#f2").onchange=e=>e.target.files[0]&&selectImg(e.target.files[0]);$("#rm").onclick=removeImg;
+addEventListener("dragover",e=>{e.preventDefault();if(page==="recognize")$("#drop").classList.add("drag")});
+addEventListener("dragleave",e=>{if(!e.relatedTarget)$("#drop").classList.remove("drag")});
+addEventListener("drop",e=>{e.preventDefault();$("#drop").classList.remove("drag");if(page==="recognize"&&e.dataTransfer.files[0])selectImg(e.dataTransfer.files[0])});
+addEventListener("paste",e=>{const f=[...(e.clipboardData?.files||[])].find(f=>f.type.startsWith("image/"));if(f){show("recognize");selectImg(f)}});
+addEventListener("keydown",e=>{if((e.ctrlKey||e.metaKey)&&e.key==="Enter"&&page==="recognize"&&!$("#go").disabled)analyze()});
+async function shrink(f){try{const bm=await createImageBitmap(f),k=Math.min(1,1600/Math.max(bm.width,bm.height));if(k===1&&f.size<8e6)return f;
+  const c=document.createElement("canvas");c.width=Math.round(bm.width*k);c.height=Math.round(bm.height*k);const g=c.getContext("2d");g.fillStyle="#fff";g.fillRect(0,0,c.width,c.height);g.drawImage(bm,0,0,c.width,c.height);
+  const b=await new Promise(r=>c.toBlob(r,"image/jpeg",.92));return b?new File([b],f.name.replace(/\.\w+$/,"")+".jpg",{type:"image/jpeg"}):f}catch{return f}}
+async function thumb(src){try{const bm=src instanceof Blob?await createImageBitmap(src):src,w=bm.width,h=bm.height,k=64/Math.max(w,h),c=document.createElement("canvas");c.width=Math.max(1,Math.round(w*k));c.height=Math.max(1,Math.round(h*k));
+  const g=c.getContext("2d");g.fillStyle="#fff";g.fillRect(0,0,c.width,c.height);g.drawImage(bm,0,0,c.width,c.height);return c.toDataURL("image/jpeg",.7)}catch{return""}}
+
+/* dibujo */
+const cv=$("#cv"),cx=cv.getContext("2d");let strokes=[],cur=null,dpr=1;
+function sizeCv(){const w=cv.parentElement.clientWidth;if(!w)return;dpr=devicePixelRatio||1;const h=Math.round(Math.max(200,w*.45));cv.style.height=h+"px";cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);redraw()}
+function redraw(){cx.setTransform(dpr,0,0,dpr,0,0);cx.clearRect(0,0,cv.width,cv.height);cx.strokeStyle="#111";cx.lineCap=cx.lineJoin="round";
+  for(const s of strokes){cx.lineWidth=s.w;cx.beginPath();s.p.forEach(([x,y],i)=>i?cx.lineTo(x,y):cx.moveTo(x,y));if(s.p.length===1)cx.lineTo(s.p[0][0]+.1,s.p[0][1]+.1);cx.stroke()}}
+const pt=e=>{const r=cv.getBoundingClientRect();return[e.clientX-r.left,e.clientY-r.top]};
+cv.onpointerdown=e=>{e.preventDefault();cv.setPointerCapture(e.pointerId);cur={w:+$("#bw").value,p:[pt(e)]};strokes.push(cur);redraw();upd()};
+cv.onpointermove=e=>{if(!cur)return;const p=pt(e),q=cur.p[cur.p.length-1];cur.p.push(p);cx.lineWidth=cur.w;cx.beginPath();cx.moveTo(q[0],q[1]);cx.lineTo(p[0],p[1]);cx.stroke()};
+cv.onpointerup=cv.onpointercancel=()=>{cur=null};
+function clearCv(){strokes=[];redraw();upd()}
+$("#clr").onclick=clearCv;$("#undo").onclick=()=>{strokes.pop();redraw();upd()};
+new ResizeObserver(()=>{if(tab==="dr")sizeCv()}).observe(cv.parentElement);
+const drawBlob=()=>{const c=document.createElement("canvas");c.width=cv.width;c.height=cv.height;const g=c.getContext("2d");g.fillStyle="#fff";g.fillRect(0,0,c.width,c.height);g.drawImage(cv,0,0);return new Promise(r=>c.toBlob(r,"image/png"))};
+
+/* análisis */
+async function analyze(){hideOut();
+  if(tab==="up"&&!file)return showErr(t("eNoImg"));if(tab==="dr"&&!strokes.length)return showErr(t("eNoDr"));
+  busy=true;upd();ctrl=new AbortController();const to=setTimeout(()=>ctrl.abort("timeout"),25000);
+  try{const src=tab==="up"?await shrink(file):await drawBlob(),name=tab==="up"?file.name:"dibujo.png",th=thumb(src);
+    const fd=new FormData();fd.append("file",src,name);
+    const r=await fetch(API+"/predict",{method:"POST",body:fd,signal:ctrl.signal});let d=null;try{d=await r.json()}catch{}
+    if(!r.ok)throw new Error(typeof d?.detail==="string"?d.detail:d?.detail?JSON.stringify(d.detail):"HTTP "+r.status);
+    if(!d||d.prediction==null||isNaN(+d.confidence))throw new Error(t("eBad"));
+    setStatus("ok");showRes(d);save(d,name,await th)}
+  catch(e){if(e.name==="AbortError")showErr(t("eTo"));else if(e instanceof TypeError){setStatus("off");showErr(t("eNet",{u:API}))}else showErr(e.message)}
+  finally{clearTimeout(to);busy=false;upd()}}
+$("#go").onclick=analyze;
+function showRes(d){last=d;const c=Math.min(100,Math.max(0,+d.confidence)),l=c>=90?"hi":c>=60?"mid":"lo";
+  $("#rNum").textContent=d.prediction;$("#rPct").textContent=c.toFixed(1)+"%";const L=$("#rLvl");L.dataset.l=l;L.textContent=t(l)+" "+t("conf");
+  $("#rBar").style.width="0";requestAnimationFrame(()=>requestAnimationFrame(()=>$("#rBar").style.width=c+"%"));
+  const al=(d.alternatives||[]).slice(0,5);$("#alts").hidden=!al.length;const box=$("#altL");box.innerHTML="";
+  al.forEach(a=>{const v=Math.min(100,Math.max(0,+a.confidence||0)),r=document.createElement("div");r.className="alt";
+    r.innerHTML="<span></span><div class='bar'><i></i></div><span></span>";r.children[0].textContent=a.number;r.children[1].firstChild.style.width=v+"%";r.children[2].textContent=v.toFixed(1)+"%";box.appendChild(r)});
+  const R=$("#res");R.hidden=false;R.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion:reduce)").matches?"auto":"smooth",block:"nearest"})}
+async function copy(s){try{await navigator.clipboard.writeText(s);toast(t("copied"))}catch{toast(t("nocopy"))}}
+$("#cp").onclick=()=>last&&copy(String(last.prediction));$("#cpt").onclick=()=>last&&copy(toTex(last.prediction));
+
+/* historial */
+function persist(){while(hist.length){try{localStorage.setItem("mathvision_history",JSON.stringify(hist));scheduleCloudSave();return}catch{hist.pop()}}LS.set("mathvision_history","[]");scheduleCloudSave()}
+function save(d,name,th){hist.unshift({id:Date.now(),prediction:d.prediction,confidence:+d.confidence,alternatives:d.alternatives||[],filename:name,date:new Date().toISOString(),thumb:th});hist=hist.slice(0,100);persist()}
+function renderHist(){const L=$("#hL");L.innerHTML="";$("#exp").hidden=$("#clrH").hidden=!hist.length;
+  if(!hist.length){$("#hSum").textContent=t("hNone");L.innerHTML="<div class='empty'><b></b><span></span></div>";L.querySelector("b").textContent=t("hE1");L.querySelector("span").textContent=t("hE2");return}
+  $("#hSum").textContent=t("hSum",{n:hist.length,a:(hist.reduce((s,h)=>s+h.confidence,0)/hist.length).toFixed(1)});
+  const loc={es:"es-ES",ca:"ca-ES",en:"en-GB"}[lang];
+  hist.forEach(h=>{const e=document.createElement("div");e.className="he";
+    e.innerHTML="<img alt=''><button class='o' type='button'><span class='n'></span><span><b></b><small></small></span><span class='c'></span></button><button class='x' type='button'>×</button>";
+    const im=e.querySelector("img");if(h.thumb)im.src=h.thumb;else im.hidden=true;
+    e.querySelector(".n").textContent=h.prediction;e.querySelector("b").textContent=h.filename;e.querySelector("small").textContent=new Date(h.date).toLocaleString(loc);e.querySelector(".c").textContent=h.confidence.toFixed(1)+"%";
+    const x=e.querySelector(".x");x.setAttribute("aria-label",t("del"));
+    e.querySelector(".o").onclick=()=>{show("recognize");setTab(tab);showRes(h)};
+    x.onclick=()=>{hist=hist.filter(i=>i.id!==h.id);persist();renderHist()};L.appendChild(e)})}
+$("#clrH").onclick=async()=>{if(await ask(t("cf"))){hist=[];persist();renderHist()}};
+$("#exp").onclick=()=>{const q=s=>'"'+String(s).replace(/"/g,'""')+'"',csv="fecha,archivo,prediccion,confianza\n"+hist.map(h=>[h.date,q(h.filename),q(h.prediction),h.confidence.toFixed(2)].join(",")).join("\n"),
+  a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["\ufeff"+csv],{type:"text/csv"}));a.download="mathvision-historial.csv";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
+
+applyTheme();applyLang();upd();ping();setInterval(ping,20000);
+</script>
+
+<script>
+
+const aboutDialog=document.querySelector("#aboutDialog");
+function openAbout(){if(!aboutDialog.open)aboutDialog.showModal()}
+document.querySelector("#openAbout").addEventListener("click",openAbout);
+document.querySelector("#closeAbout").addEventListener("click",()=>aboutDialog.close());
+document.querySelector("#closeAboutBottom").addEventListener("click",()=>aboutDialog.close());
+aboutDialog.addEventListener("click",e=>{if(e.target===aboutDialog)aboutDialog.close()});
+
+/* Cuenta y sincronización en la nube (Supabase). La clave publishable es pública; RLS protege los datos. */
+const SUPABASE_URL="https://uhocdviotvokfurfibgc.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY="sb_publishable_ZlDwNdDON9nkwdXL_CCrVQ_3rhM_eHx";
+const supabaseClient=window.supabase?.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
+let cloudUser=null,cloudTimer=null,cloudBusy=false,cloudReady=false;
+const authText=(m)=>{const el=document.querySelector("#authStatus");if(el)el.textContent=m};
+function paintAccount(user){
+  cloudUser=user||null;
+  document.querySelector("#signedOut").hidden=!!user;
+  document.querySelector("#signedIn").hidden=!user;
+  const email=user?.email||"";
+  document.querySelector("#accountEmail").textContent=email;
+  const fullName=user?.user_metadata?.full_name||user?.user_metadata?.name||"";
+  const displayName=fullName|| (email?email.split("@")[0]:"Cuenta");
+  document.querySelector("#accountTriggerName").textContent=user?displayName:"Cuenta";
+  document.querySelector("#accountTriggerSub").textContent=user?email:"Inicia sesión";
+  document.querySelector("#accountAvatar").textContent=user?(displayName.trim()[0]||email[0]||"U").toUpperCase():"?";
+  if(user)authText("Sesión iniciada. Tu historial y tus ajustes se sincronizan con tu cuenta.");
+  else authText("Sin iniciar sesión. Los datos se guardan en este dispositivo.");
+}
+function scheduleCloudSave(){if(!cloudUser||!cloudReady)return;clearTimeout(cloudTimer);cloudTimer=setTimeout(()=>saveCloud().catch(e=>authText("No se pudo sincronizar: "+(e.message||e))),700)}
+async function loadCloud(){if(!cloudUser||!supabaseClient)return;authText("Cargando tus datos…");const {data,error}=await supabaseClient.from("user_data").select("history,settings").eq("user_id",cloudUser.id).maybeSingle();if(error)throw error;
+  if(data){hist=Array.isArray(data.history)?data.history:[];LS.set("mathvision_history",JSON.stringify(hist));const st=data.settings||{};if(["dark","light","system"].includes(st.theme)){theme=st.theme;LS.set("mathvision_theme",theme);applyTheme()}if(["es","ca","en"].includes(st.language)){lang=st.language;LS.set("mathvision_language",lang);applyLang()}renderHist();authText("Datos sincronizados desde tu cuenta.")}
+  else{await saveCloud();authText("Cuenta conectada. Se ha guardado tu historial local en la nube.")}
+  cloudReady=true;
+}
+async function saveCloud(){if(!cloudUser||!supabaseClient||cloudBusy)return;cloudBusy=true;try{const payload={user_id:cloudUser.id,history:hist,settings:{theme,language:lang},updated_at:new Date().toISOString()};const {error}=await supabaseClient.from("user_data").upsert(payload,{onConflict:"user_id"});if(error)throw error;authText("Sincronizado correctamente.")}finally{cloudBusy=false}}
+async function authAction(promise){authText("Procesando…");const {data,error}=await promise;if(error){authText(error.message);return}if(data?.session?.user){cloudUser=data.session.user;paintAccount(data.session.user);try{await loadCloud()}catch(e){authText("Error al cargar los datos: "+e.message)}}else if(data?.user){authText("Cuenta creada. Revisa tu correo y confirma la dirección antes de iniciar sesión.")}}
+document.querySelector("#signIn").onclick=()=>{const email=document.querySelector("#authEmail").value.trim(),password=document.querySelector("#authPassword").value;if(!email||!password)return authText("Introduce tu correo y contraseña.");authAction(supabaseClient.auth.signInWithPassword({email,password}))};
+document.querySelector("#signUp").onclick=()=>{const email=document.querySelector("#authEmail").value.trim(),password=document.querySelector("#authPassword").value;if(!email||!password)return authText("Introduce tu correo y una contraseña.");if(password.length<8)return authText("La contraseña debe tener al menos 8 caracteres.");authAction(supabaseClient.auth.signUp({email,password,options:{emailRedirectTo:window.location.origin+window.location.pathname}}))};
+document.querySelector("#googleSignIn").onclick=async()=>{authText("Abriendo Google…");const {error}=await supabaseClient.auth.signInWithOAuth({provider:"google",options:{redirectTo:window.location.origin+window.location.pathname}});if(error)authText(error.message)};
+document.querySelector("#signOut").onclick=async()=>{const {error}=await supabaseClient.auth.signOut();if(error){authText(error.message);return}cloudReady=false;paintAccount(null)};
+document.querySelector("#syncNow").onclick=async()=>{try{await saveCloud()}catch(e){authText("No se pudo sincronizar: "+e.message)}};
+const accountDialog=document.querySelector("#accountDialog");
+function openAccount(){if(!accountDialog.open)accountDialog.showModal()}
+document.querySelector("#accountTrigger").addEventListener("click",openAccount);
+document.querySelector("#accountOpenFromSettings").addEventListener("click",openAccount);
+document.querySelector("#accountClose").addEventListener("click",()=>accountDialog.close());
+accountDialog.addEventListener("click",e=>{if(e.target===accountDialog)accountDialog.close()});
+if(!supabaseClient){authText("No se ha podido cargar el servicio de cuentas. Comprueba tu conexión a Internet.")}
+else{supabaseClient.auth.onAuthStateChange((_event,session)=>{setTimeout(async()=>{const user=session?.user||null;if(user){cloudUser=user;paintAccount(user);try{await loadCloud()}catch(e){authText("Error de sincronización: "+e.message)}}else{cloudUser=null;cloudReady=false;paintAccount(null)}},0)});supabaseClient.auth.getSession().then(({data,error})=>{if(error){authText(error.message);return}if(data.session?.user){cloudUser=data.session.user;paintAccount(cloudUser);loadCloud().catch(e=>authText("Error de sincronización: "+e.message))}else paintAccount(null)})}
+</script>
+
+</body>
+</html>
