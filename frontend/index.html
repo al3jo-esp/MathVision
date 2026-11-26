@@ -97,7 +97,7 @@ dialog .row{justify-content:flex-end}
 body{overflow:auto;height:auto}.app{height:auto;min-height:100dvh}.side{display:none}.main{overflow:visible;padding-bottom:calc(var(--bn) + env(safe-area-inset-bottom))}
 .top{padding:12px 16px}.crumb{display:none}.wrap{padding:26px 16px 36px}
 .bnav{display:flex;position:fixed;inset:auto 0 0;height:calc(var(--bn) + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);background:var(--side);border-top:1px solid var(--bd);z-index:5}
-.bnav .nav{flex:1;min-width:0;width:auto;flex-direction:column;justify-content:center;gap:2px;font-size:12px;border-radius:0;margin:0;text-align:center}.bnav .nav[aria-current=page]{background:none;box-shadow:none;color:var(--ac)}
+.bnav .nav{display:flex;flex:1 1 25%;min-width:0;width:25%;height:100%;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:5px 2px;border:0;border-radius:0;margin:0;background:transparent;color:var(--mu);font-size:11px;line-height:1.2;text-align:center}.bnav .nav svg{display:block;width:21px;height:21px;flex:none}.bnav .nav span{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.bnav .nav[aria-current=page]{background:transparent;box-shadow:none;color:var(--ac)}
 .act{flex-direction:column;align-items:stretch}.act .btn{width:100%}.alt{grid-template-columns:36px 1fr 52px}
 }
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
@@ -172,7 +172,12 @@ body{overflow:auto;height:auto}.app{height:auto;min-height:100dvh}.side{display:
 </div>
 </main>
 </div>
-<nav class="bnav" aria-label="Navegación"></nav>
+<nav class="bnav" aria-label="Navegación móvil">
+<button class="nav" type="button" data-page="recognize"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3M8 12h8"/></svg><span data-i18n="rec"></span></button>
+<button class="nav" type="button" data-page="history"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg><span data-i18n="hist"></span></button>
+<button class="nav" type="button" data-page="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 7h9M18 7h1M5 17h1M10 17h9"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg><span data-i18n="set"></span></button>
+<button class="nav" type="button" id="mobileAccount" aria-haspopup="dialog" aria-controls="accountDialog"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span data-i18n="accountNav"></span></button>
+</nav>
 <dialog id="accountDialog" aria-labelledby="accountDialogTitle">
   <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px"><b id="accountDialogTitle">Cuenta MathVision</b><button class="x" id="accountClose" type="button" aria-label="Cerrar">×</button></div>
   <p style="margin:0 0 12px;color:var(--mu);font-size:13px">Inicia sesión para sincronizar tu historial y tus preferencias entre dispositivos.</p>
@@ -240,15 +245,14 @@ const toTex=s=>[...String(s)].map(c=>TEX[c]??c).join(" ");
 function applyLang(){document.documentElement.lang=lang;
   $$("[data-i18n]").forEach(e=>e.textContent=t(e.dataset.i18n));
   $$("[data-i18n-aria]").forEach(e=>e.setAttribute("aria-label",t(e.dataset.i18nAria)));
-  $("#lang").value=lang;setStatus(stS);crumb();renderHist();buildBnav()}
+  $("#lang").value=lang;setStatus(stS);crumb();renderHist()}
 function applyTheme(){const dk=theme==="dark"||(theme==="system"&&matchMedia("(prefers-color-scheme:dark)").matches);
   document.documentElement.dataset.theme=dk?"dark":"light";$("meta[name=theme-color]").content=dk?"#10141a":"#f3f5f7";$("#theme").value=theme}
 matchMedia("(prefers-color-scheme:dark)").addEventListener("change",applyTheme);
 function crumb(){$("#crumb").textContent=t("crumb")+t(page==="recognize"?"rec":page==="history"?"hist":"set")}
-function buildBnav(){const b=$(".bnav");b.innerHTML="";$(".side .nav").forEach(n=>{const c=n.cloneNode(true);c.removeAttribute("data-i18n");b.appendChild(c)});const a=document.createElement("button");a.className="nav";a.type="button";a.id="mobileAccount";a.setAttribute("aria-haspopup","dialog");a.setAttribute("aria-controls","accountDialog");a.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span></span>';a.querySelector("span").textContent=t("accountNav");b.appendChild(a);a.addEventListener("click",()=>{const d=$("#accountDialog");if(d&&!d.open)d.showModal()});markNav()}
 function markNav(){$$(".nav").forEach(n=>n.toggleAttribute("aria-current",false)||(n.dataset.page===page&&n.setAttribute("aria-current","page")))}
 function show(p){page=p;$$(".page").forEach(e=>e.classList.toggle("on",e.id==="page-"+p));markNav();crumb();if(p==="history")renderHist();if(p==="recognize"&&tab==="dr")sizeCv();$(".main").scrollTo({top:0})}
-document.addEventListener("click",e=>{const n=e.target.closest(".nav[data-page]");if(n)show(n.dataset.page)});
+document.addEventListener("click",e=>{if(e.target.closest("#mobileAccount")){openAccount();return}const n=e.target.closest(".nav[data-page]");if(n)show(n.dataset.page)});
 $("#home").onclick=()=>{show("recognize");removeImg();clearCv();hideOut()};
 $("#theme").onchange=e=>{theme=e.target.value;LS.set("mathvision_theme",theme);applyTheme();scheduleCloudSave()};
 $("#lang").onchange=e=>{lang=e.target.value;LS.set("mathvision_language",lang);applyLang();scheduleCloudSave()};
