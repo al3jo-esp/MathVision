@@ -248,7 +248,7 @@ function crumb(){$("#crumb").textContent=t("crumb")+t(page==="recognize"?"rec":p
 function buildBnav(){const b=$(".bnav");b.innerHTML="";$(".side .nav").forEach(n=>{const c=n.cloneNode(true);c.removeAttribute("data-i18n");b.appendChild(c)});const a=document.createElement("button");a.className="nav";a.type="button";a.id="mobileAccount";a.setAttribute("aria-haspopup","dialog");a.setAttribute("aria-controls","accountDialog");a.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span></span>';a.querySelector("span").textContent=t("accountNav");b.appendChild(a);a.addEventListener("click",()=>{const d=$("#accountDialog");if(d&&!d.open)d.showModal()});markNav()}
 function markNav(){$$(".nav").forEach(n=>n.toggleAttribute("aria-current",false)||(n.dataset.page===page&&n.setAttribute("aria-current","page")))}
 function show(p){page=p;$$(".page").forEach(e=>e.classList.toggle("on",e.id==="page-"+p));markNav();crumb();if(p==="history")renderHist();if(p==="recognize"&&tab==="dr")sizeCv();$(".main").scrollTo({top:0})}
-document.addEventListener("click",e=>{const n=e.target.closest(".nav");if(n)show(n.dataset.page)});
+document.addEventListener("click",e=>{const n=e.target.closest(".nav[data-page]");if(n)show(n.dataset.page)});
 $("#home").onclick=()=>{show("recognize");removeImg();clearCv();hideOut()};
 $("#theme").onchange=e=>{theme=e.target.value;LS.set("mathvision_theme",theme);applyTheme();scheduleCloudSave()};
 $("#lang").onchange=e=>{lang=e.target.value;LS.set("mathvision_language",lang);applyLang();scheduleCloudSave()};
