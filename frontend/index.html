@@ -30,8 +30,8 @@ button,input,select{font:inherit;color:inherit}button{cursor:pointer}
 .account-trigger .chev{color:var(--mu);font-size:17px}
 #accountDialog{width:min(440px,calc(100vw - 32px));max-width:440px;padding:22px}
 #accountDialog .account-grid{grid-template-columns:1fr}#accountDialog .account-actions{flex-direction:column}#accountDialog .account-actions .btn{width:100%}
-.account-mobile{display:none}
-@media(max-width:700px){.account-mobile{display:block;margin-top:14px}.account-mobile .btn{width:100%}}
+.account-mobile{display:none}.account-top{display:none}
+@media(max-width:700px){.account-mobile{display:block;margin-top:14px}.account-mobile .btn{width:100%}.account-top{display:inline-flex;white-space:nowrap;padding:7px 11px;font-size:13px}}
 .main{flex:1;min-width:0;overflow-y:auto;display:flex;flex-direction:column}
 .top{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 32px;border-bottom:1px solid var(--bd);min-height:58px}
 .crumb{color:var(--mu);font-size:13px}
@@ -119,7 +119,7 @@ body{overflow:auto;height:auto}.app{height:auto;min-height:100dvh}.side{display:
   </div>
 </aside>
 <main class="main">
-<header class="top"><div class="crumb" id="crumb"></div><div class="pill" id="st" data-s="wait" role="status"><span class="dot"></span><span id="stT"></span></div></header>
+<header class="top"><div class="crumb" id="crumb"></div><div style="display:flex;align-items:center;gap:8px"><button class="btn account-top" id="accountOpenTop" type="button" aria-haspopup="dialog" aria-controls="accountDialog">Cuenta</button><div class="pill" id="st" data-s="wait" role="status"><span class="dot"></span><span id="stT"></span></div></div></header>
 <div class="wrap">
 
 <section class="page on" id="page-recognize">
@@ -202,7 +202,7 @@ body{overflow:auto;height:auto}.app{height:auto;min-height:100dvh}.side{display:
 <script>
 const T={
 es:{new:"Nuevo reconocimiento",tag:"Matemáticas manuscritas",rec:"Reconocer",hist:"Historial",set:"Ajustes",ok:"Servidor conectado",off:"Sin conexión con el servidor",wait:"Conectando…",
-h1:"Del trazo al símbolo.",lead:"Sube una foto o dibuja a mano. MathVision reconoce lo que has escrito y te dice qué tan seguro está.",
+h1:"Del trazo al símbolo.",lead:"Sube una imagen o dibuja un número para reconocerlo.",
 tUp:"Subir imagen",tDr:"Dibujar",drop:"Arrastra una imagen o pulsa para elegirla",dropSub:"También puedes pegarla con Ctrl+V. PNG, JPG y otros formatos.",pick:"Elegir archivo",cam:"Hacer foto",rm:"Quitar imagen",
 brush:"Grosor",undo:"Deshacer",clear:"Borrar",note:"Ctrl+Intro para analizar",go:"Analizar",goB:"Analizando…",res:"Resultado",conf:"confianza",hi:"Alta",mid:"Media",lo:"Baja",alt:"Otras posibilidades",
 copy:"Copiar texto",copyTex:"Copiar LaTeX",copied:"Copiado",nocopy:"No se pudo copiar",hSum:"{n} reconocimientos guardados.",hNone:"Aquí aparecerán tus reconocimientos.",
@@ -210,7 +210,7 @@ hE1:"Todavía no hay nada",hE2:"Analiza una imagen o un dibujo y se guardará aq
 setD:"Ajusta la apariencia y el idioma.",theme:"Tema",tSys:"Según el sistema",tLight:"Claro",tDark:"Oscuro",lang:"Idioma",api:"Dirección del servidor",apiD:"Donde está funcionando el backend.",test:"Probar conexión",about:"Acerca de",
 eType:"Elige un archivo de imagen válido.",eBig:"La imagen pesa más de 20 MB.",eNet:"No se ha podido conectar con el servidor. Comprueba que el backend está en marcha en {u}.",eTo:"El servidor ha tardado demasiado en responder.",eBad:"La respuesta del servidor no tiene el formato esperado.",eNoImg:"Primero elige una imagen.",eNoDr:"Primero dibuja algo.",crumb:"Espacio de trabajo / "},
 ca:{new:"Nou reconeixement",tag:"Matemàtiques manuscrites",rec:"Reconèixer",hist:"Historial",set:"Configuració",ok:"Servidor connectat",off:"Sense connexió amb el servidor",wait:"Connectant…",
-h1:"Del traç al símbol.",lead:"Puja una foto o dibuixa a mà. MathVision reconeix el que has escrit i et diu com de segur n'està.",
+h1:"Del traç al símbol.",lead:"Puja una imatge o dibuixa un número perquè el puguem reconèixer.",
 tUp:"Pujar imatge",tDr:"Dibuixar",drop:"Arrossega una imatge o prem per triar-la",dropSub:"També pots enganxar-la amb Ctrl+V. PNG, JPG i altres formats.",pick:"Triar fitxer",cam:"Fer foto",rm:"Treure imatge",
 brush:"Gruix",undo:"Desfer",clear:"Esborrar",note:"Ctrl+Intro per analitzar",go:"Analitzar",goB:"Analitzant…",res:"Resultat",conf:"confiança",hi:"Alta",mid:"Mitjana",lo:"Baixa",alt:"Altres possibilitats",
 copy:"Copiar text",copyTex:"Copiar LaTeX",copied:"Copiat",nocopy:"No s'ha pogut copiar",hSum:"{n} reconeixements desats.",hNone:"Aquí apareixeran els teus reconeixements.",
@@ -218,7 +218,7 @@ hE1:"Encara no hi ha res",hE2:"Analitza una imatge o un dibuix i es desarà aqu�
 setD:"Ajusta l'aparença i l'idioma.",theme:"Tema",tSys:"Segons el sistema",tLight:"Clar",tDark:"Fosc",lang:"Idioma",api:"Adreça del servidor",apiD:"On està funcionant el backend.",test:"Provar connexió",about:"Sobre",
 eType:"Tria un fitxer d'imatge vàlid.",eBig:"La imatge pesa més de 20 MB.",eNet:"No s'ha pogut connectar amb el servidor. Comprova que el backend està en marxa a {u}.",eTo:"El servidor ha trigat massa a respondre.",eBad:"La resposta del servidor no té el format esperat.",eNoImg:"Primer tria una imatge.",eNoDr:"Primer dibuixa alguna cosa.",crumb:"Espai de treball / "},
 en:{new:"New recognition",tag:"Handwritten maths",rec:"Recognise",hist:"History",set:"Settings",ok:"Server connected",off:"No connection to the server",wait:"Connecting…",
-h1:"From stroke to symbol.",lead:"Upload a photo or draw by hand. MathVision reads what you wrote and tells you how sure it is.",
+h1:"From stroke to symbol.",lead:"Upload an image or draw a number to have it recognized.",
 tUp:"Upload image",tDr:"Draw",drop:"Drop an image or click to choose one",dropSub:"You can also paste it with Ctrl+V. PNG, JPG and other formats.",pick:"Choose file",cam:"Take photo",rm:"Remove image",
 brush:"Brush",undo:"Undo",clear:"Clear",note:"Ctrl+Enter to analyse",go:"Analyse",goB:"Analysing…",res:"Result",conf:"confidence",hi:"High",mid:"Medium",lo:"Low",alt:"Other possibilities",
 copy:"Copy text",copyTex:"Copy LaTeX",copied:"Copied",nocopy:"Could not copy",hSum:"{n} saved recognitions.",hNone:"Your recognitions will appear here.",
@@ -386,6 +386,7 @@ const accountDialog=document.querySelector("#accountDialog");
 function openAccount(){if(!accountDialog.open)accountDialog.showModal()}
 document.querySelector("#accountTrigger").addEventListener("click",openAccount);
 document.querySelector("#accountOpenFromSettings").addEventListener("click",openAccount);
+document.querySelector("#accountOpenTop").addEventListener("click",openAccount);
 document.querySelector("#accountClose").addEventListener("click",()=>accountDialog.close());
 accountDialog.addEventListener("click",e=>{if(e.target===accountDialog)accountDialog.close()});
 if(!supabaseClient){authText("No se ha podido cargar el servicio de cuentas. Comprueba tu conexión a Internet.")}
